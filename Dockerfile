@@ -2,10 +2,21 @@ FROM golang:1.21.5 as base
 
 FROM base as dev
 
-RUN curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
+ENV PROJECT_DIR=/app \
+    GO111MODULE=on \
+    CGO_ENABLED=0
 
 WORKDIR /app
+RUN mkdir "/build"
+COPY . .
+WORKDIR /app/src
+RUN go get github.com/githubnemo/CompileDaemon
+RUN go install github.com/githubnemo/CompileDaemon
+RUN go get github.com/golang-migrate/migrate/v4/database/mysql
+RUN go get github.com/joho/godotenv
+RUN go get github.com/labstack/echo/v4
+WORKDIR /app
 
-CMD ["air"]
+ENTRYPOINT CompileDaemon -build="go build -o /build/app" -command="/build/app"
 
 EXPOSE 8080
