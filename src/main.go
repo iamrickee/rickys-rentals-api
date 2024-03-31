@@ -6,11 +6,12 @@ import (
 
 	"iamricky.com/truck-rental/config"
 	"iamricky.com/truck-rental/migrate"
+	"iamricky.com/truck-rental/rootpath"
 	"iamricky.com/truck-rental/router"
 )
 
 func main() {
-
+	rootpath.Init()
 	config.Init(".env")
 
 	args := os.Args[1:]

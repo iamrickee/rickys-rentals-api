@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"iamricky.com/truck-rental/auth"
 )
 
 func Route() {
@@ -13,7 +14,7 @@ func Route() {
 	})
 
 	e.GET("/register", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Register")
+		return auth.Register(c)
 	})
 
 	e.GET("/login", func(c echo.Context) error {
