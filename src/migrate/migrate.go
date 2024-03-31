@@ -12,6 +12,7 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"iamricky.com/truck-rental/db"
+	"iamricky.com/truck-rental/rootpath"
 )
 
 func Migrate() {
@@ -118,9 +119,15 @@ func down(amount int) {
 		os.Exit(1)
 	}
 	if amount > 0 {
-		m.Steps(-amount)
+		err = m.Steps(-amount)
 	} else {
-		m.Down()
+		err = m.Down()
+	}
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	} else {
+		fmt.Println("Successfully Migrated Down")
 	}
 }
 
@@ -141,20 +148,20 @@ func up(amount int) {
 		os.Exit(1)
 	}
 	if amount > 0 {
-		m.Steps(amount)
+		err = m.Steps(amount)
 	} else {
-		m.Up()
+		err = m.Up()
+	}
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	} else {
+		fmt.Println("Successfully Migrated Up")
 	}
 }
 
 func getMigrationsDir() string {
-	wd, err := os.Getwd()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	parent := filepath.Dir(wd)
-	migrationsDir := filepath.Join(parent, "migrations")
+	migrationsDir := filepath.Join(rootpath.Root, "migrations")
 	os.Mkdir(migrationsDir, 0644)
 	return migrationsDir
 }

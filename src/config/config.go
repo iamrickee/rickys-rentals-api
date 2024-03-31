@@ -3,19 +3,13 @@ package config
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/joho/godotenv"
+	"iamricky.com/truck-rental/rootpath"
 )
 
-func Init() {
-	wd, err := os.Getwd()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	parent := filepath.Dir(wd)
-	err = godotenv.Load(filepath.Join(parent, ".env"))
+func Init(envFile string) {
+	err := godotenv.Load(rootpath.Root + "/" + envFile)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

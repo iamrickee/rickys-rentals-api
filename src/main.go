@@ -10,7 +10,8 @@ import (
 )
 
 func main() {
-	config.Init()
+
+	config.Init(".env")
 
 	args := os.Args[1:]
 	if len(args) >= 1 {
