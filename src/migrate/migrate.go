@@ -12,6 +12,7 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"iamricky.com/truck-rental/db"
+	"iamricky.com/truck-rental/errhandler"
 	"iamricky.com/truck-rental/rootpath"
 )
 
@@ -90,74 +91,48 @@ func create(name string) {
 	down := filepath.Join(migrationsDir, strconv.Itoa(index)+"_"+name+".down.sql")
 	var content []byte
 	errUp := os.WriteFile(up, content, 0755)
-	if errUp != nil {
-		fmt.Println(errUp)
-		os.Exit(1)
-	}
+	errhandler.Fatal(errUp, true)
 	errDown := os.WriteFile(down, content, 0755)
-	if errDown != nil {
-		fmt.Println(errDown)
-		os.Exit(1)
-	}
+	errhandler.Fatal(errDown, true)
 	fmt.Println("Created migrations: " + strconv.Itoa(index) + "_" + name)
 }
 
 func down(amount int) {
 	db, _ := db.GetConn()
 	driver, err := mysql.WithInstance(db, &mysql.Config{})
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	errhandler.Fatal(err, true)
 	m, err := migrate.NewWithDatabaseInstance(
 		"file://"+getMigrationsDir(),
 		"mysql",
 		driver,
 	)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	errhandler.Fatal(err, true)
 	if amount > 0 {
 		err = m.Steps(-amount)
 	} else {
 		err = m.Down()
 	}
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	} else {
-		fmt.Println("Successfully Migrated Down")
-	}
+	errhandler.Fatal(err, true)
+	fmt.Println("Successfully Migrated Down")
 }
 
 func up(amount int) {
 	db, _ := db.GetConn()
 	driver, err := mysql.WithInstance(db, &mysql.Config{})
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	errhandler.Fatal(err, true)
 	m, err := migrate.NewWithDatabaseInstance(
 		"file://"+getMigrationsDir(),
 		"mysql",
 		driver,
 	)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	errhandler.Fatal(err, true)
 	if amount > 0 {
 		err = m.Steps(amount)
 	} else {
 		err = m.Up()
 	}
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	} else {
-		fmt.Println("Successfully Migrated Up")
-	}
+	errhandler.Fatal(err, true)
+	fmt.Println("Successfully Migrated Up")
 }
 
 func getMigrationsDir() string {
