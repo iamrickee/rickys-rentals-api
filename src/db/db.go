@@ -8,16 +8,7 @@ import (
 )
 
 type DB interface {
-	Execute(query string) error
 	GetConnection() (*sql.DB, error)
-}
-
-func Exec(query string) error {
-	db := getDriver()
-	if db != nil {
-		return db.Execute(query)
-	}
-	return errors.New("invalid database type")
 }
 
 func GetConn() (*sql.DB, error) {
