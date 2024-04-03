@@ -3,6 +3,7 @@ module iamricky.com/truck-rental
 go 1.21.5
 
 require (
+	github.com/alexedwards/argon2id v1.0.0 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect

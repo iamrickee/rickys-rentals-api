@@ -83,7 +83,6 @@ func create(name string) {
 				}
 			}
 		}
-		fmt.Println(filepath.Base(path))
 		return nil
 	})
 	index++

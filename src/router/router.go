@@ -2,7 +2,6 @@ package router
 
 import (
 	"crypto/subtle"
-	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -21,16 +20,16 @@ func Route() {
 		return false, nil
 	}))
 
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, Router!")
-	})
-
 	e.POST("/register", func(c echo.Context) error {
-		return auth.Register(c)
+		return auth.RegisterRoute(c)
 	})
 
-	e.GET("/login", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Login")
+	e.POST("/login", func(c echo.Context) error {
+		return auth.LoginRoute(c)
+	})
+
+	e.POST("/token", func(c echo.Context) error {
+		return auth.TokenRoute(c)
 	})
 
 	e.Logger.Fatal(e.Start(":8080"))

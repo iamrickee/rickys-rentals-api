@@ -12,9 +12,11 @@ COPY . .
 WORKDIR /app/src
 RUN go get github.com/githubnemo/CompileDaemon
 RUN go install github.com/githubnemo/CompileDaemon
+RUN go get github.com/alexedwards/argon2id
 RUN go get github.com/golang-migrate/migrate/v4/database/mysql
 RUN go get github.com/joho/godotenv
 RUN go get github.com/labstack/echo/v4
+RUN go get github.com/labstack/echo/middleware
 WORKDIR /app
 
 ENTRYPOINT CompileDaemon -build="go build -o /build/app" -command="/build/app"
