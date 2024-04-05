@@ -24,12 +24,30 @@ type LocationResp struct {
 	Message string   `json:"message"`
 }
 
+type SuccessResp struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
 func SaveRoute(c echo.Context) error {
 	location, err := save(c)
 	if err != nil {
 		return err
 	}
 	resp := LocationResp{Data: location, Message: "location saved"}
+	jsonResp, err := json.Marshal(resp)
+	if err != nil {
+		return c.String(http.StatusOK, fmt.Sprintf("%s", err))
+	}
+	return c.String(http.StatusOK, string(jsonResp))
+}
+
+func DeleteRoute(c echo.Context) error {
+	err := delete(c)
+	if err != nil {
+		return err
+	}
+	resp := SuccessResp{Success: true, Message: "location deleted"}
 	jsonResp, err := json.Marshal(resp)
 	if err != nil {
 		return c.String(http.StatusOK, fmt.Sprintf("%s", err))
@@ -51,7 +69,7 @@ func save(c echo.Context) (Location, error) {
 	idInt, err := strconv.Atoi(id)
 	if err == nil {
 		q := "UPDATE locations SET address = ?, city = ?, state = ?, zip = ? WHERE id = ?"
-		_, err := conn.ExecContext(c.Request().Context(), q, address, city, state, zip, id)
+		_, err := conn.ExecContext(c.Request().Context(), q, address, city, state, zip, idInt)
 		if err != nil {
 			return Location{}, err
 		}
@@ -65,6 +83,23 @@ func save(c echo.Context) (Location, error) {
 			return Location{}, err
 		}
 		return getLast(c)
+	}
+}
+
+func delete(c echo.Context) error {
+	id := c.FormValue("id")
+	conn, err := db.GetConn()
+	if err != nil {
+		fmt.Println("fail to connect")
+		return err
+	}
+	idInt, err := strconv.Atoi(id)
+	if err == nil {
+		q := "DELETE FROM locations WHERE id = ?"
+		_, err := conn.ExecContext(c.Request().Context(), q, idInt)
+		return err
+	} else {
+		return err
 	}
 }
 

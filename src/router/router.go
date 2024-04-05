@@ -37,12 +37,20 @@ func Route() {
 	authGroup := e.Group("/verify")
 	authGroup.Use(authMiddleware.Verify)
 
-	authGroup.POST("/locations", func(c echo.Context) error {
+	authGroup.GET("/locations", func(c echo.Context) error {
 		return location.ListRoute(c)
 	})
 
-	authGroup.POST("/location/save", func(c echo.Context) error {
+	authGroup.PUT("/location/save", func(c echo.Context) error {
 		return location.SaveRoute(c)
+	})
+
+	authGroup.DELETE("/location/delete", func(c echo.Context) error {
+		return location.DeleteRoute(c)
+	})
+
+	authGroup.GET("/location/get", func(c echo.Context) error {
+		return location.DeleteRoute(c)
 	})
 
 	e.Logger.Fatal(e.Start(":8080"))
