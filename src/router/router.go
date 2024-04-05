@@ -7,6 +7,8 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"iamricky.com/truck-rental/auth"
 	"iamricky.com/truck-rental/config"
+	"iamricky.com/truck-rental/location"
+	authMiddleware "iamricky.com/truck-rental/middleware"
 )
 
 func Route() {
@@ -30,6 +32,13 @@ func Route() {
 
 	e.POST("/token", func(c echo.Context) error {
 		return auth.TokenRoute(c)
+	})
+
+	authGroup := e.Group("/verify")
+	authGroup.Use(authMiddleware.Verify)
+
+	authGroup.POST("/locations", func(c echo.Context) error {
+		return location.LocationsRoute(c)
 	})
 
 	e.Logger.Fatal(e.Start(":8080"))

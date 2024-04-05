@@ -34,7 +34,7 @@ func TokenRoute(c echo.Context) error {
 		}
 		return c.String(http.StatusOK, string(jsonResp))
 	}
-	err := tokenLogin(c, name, token)
+	err := TokenLogin(c, name, token)
 	if err != nil {
 		resp.Message = fmt.Sprintf("%s", err)
 		jsonResp, err := json.Marshal(resp)
@@ -52,7 +52,7 @@ func TokenRoute(c echo.Context) error {
 	return c.String(http.StatusOK, string(jsonResp))
 }
 
-func tokenLogin(c echo.Context, name string, token string) error {
+func TokenLogin(c echo.Context, name string, token string) error {
 	conn, err := db.GetConn()
 	if err != nil {
 		fmt.Println("fail to connect")
