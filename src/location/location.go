@@ -32,7 +32,7 @@ type SuccessResp struct {
 func SaveRoute(c echo.Context) error {
 	location, err := save(c)
 	if err != nil {
-		return err
+		return c.String(http.StatusOK, fmt.Sprintf("%s", err))
 	}
 	resp := LocationResp{Data: location, Message: "location saved"}
 	jsonResp, err := json.Marshal(resp)
@@ -45,9 +45,27 @@ func SaveRoute(c echo.Context) error {
 func DeleteRoute(c echo.Context) error {
 	err := delete(c)
 	if err != nil {
-		return err
+		return c.String(http.StatusOK, fmt.Sprintf("%s", err))
 	}
 	resp := SuccessResp{Success: true, Message: "location deleted"}
+	jsonResp, err := json.Marshal(resp)
+	if err != nil {
+		return c.String(http.StatusOK, fmt.Sprintf("%s", err))
+	}
+	return c.String(http.StatusOK, string(jsonResp))
+}
+
+func GetRoute(c echo.Context) error {
+	id := c.FormValue("id")
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		return c.String(http.StatusOK, fmt.Sprintf("%s", err))
+	}
+	location, err := get(c, idInt)
+	if err != nil {
+		return c.String(http.StatusOK, fmt.Sprintf("%s", err))
+	}
+	resp := LocationResp{Data: location, Message: "location loaded"}
 	jsonResp, err := json.Marshal(resp)
 	if err != nil {
 		return c.String(http.StatusOK, fmt.Sprintf("%s", err))

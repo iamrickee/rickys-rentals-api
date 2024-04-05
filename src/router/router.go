@@ -50,7 +50,7 @@ func Route() {
 	})
 
 	authGroup.GET("/location/get", func(c echo.Context) error {
-		return location.DeleteRoute(c)
+		return location.GetRoute(c)
 	})
 
 	e.Logger.Fatal(e.Start(":8080"))

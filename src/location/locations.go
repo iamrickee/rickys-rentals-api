@@ -17,7 +17,7 @@ type LocationsResp struct {
 func ListRoute(c echo.Context) error {
 	locations, err := getList(c)
 	if err != nil {
-		return err
+		return c.String(http.StatusOK, fmt.Sprintf("%s", err))
 	}
 	resp := LocationsResp{Data: locations, Message: "locations fetched"}
 	jsonResp, err := json.Marshal(resp)
