@@ -38,7 +38,11 @@ func Route() {
 	authGroup.Use(authMiddleware.Verify)
 
 	authGroup.POST("/locations", func(c echo.Context) error {
-		return location.LocationsRoute(c)
+		return location.ListRoute(c)
+	})
+
+	authGroup.POST("/location/save", func(c echo.Context) error {
+		return location.SaveRoute(c)
 	})
 
 	e.Logger.Fatal(e.Start(":8080"))

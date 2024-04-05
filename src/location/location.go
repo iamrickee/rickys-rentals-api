@@ -1,18 +1,15 @@
 package location
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"iamricky.com/truck-rental/db"
 )
-
-type LocationsResp struct {
-	Data    []Location `json:"data"`
-	Message string     `json:"message"`
-}
 
 type Location struct {
 	Id      int    `json:"id"`
@@ -22,41 +19,89 @@ type Location struct {
 	Zip     string `json:"zip"`
 }
 
-func LocationsRoute(c echo.Context) error {
-	locations, err := getLocations(c)
+type LocationResp struct {
+	Data    Location `json:"data"`
+	Message string   `json:"message"`
+}
+
+func SaveRoute(c echo.Context) error {
+	location, err := save(c)
 	if err != nil {
 		return err
 	}
-	resp := LocationsResp{Data: locations, Message: "locations fetched"}
+	resp := LocationResp{Data: location, Message: "location saved"}
 	jsonResp, err := json.Marshal(resp)
 	if err != nil {
 		return c.String(http.StatusOK, fmt.Sprintf("%s", err))
 	}
 	return c.String(http.StatusOK, string(jsonResp))
-
 }
 
-func getLocations(c echo.Context) ([]Location, error) {
+func save(c echo.Context) (Location, error) {
+	id := c.FormValue("id")
+	address := c.FormValue("address")
+	city := c.FormValue("city")
+	state := c.FormValue("state")
+	zip := c.FormValue("zip")
 	conn, err := db.GetConn()
 	if err != nil {
 		fmt.Println("fail to connect")
-		return nil, err
+		return Location{}, err
 	}
-	q := "SELECT id, address, city, state, zip FROM locations;"
-	rows, err := conn.QueryContext(c.Request().Context(), q)
-	if err != nil {
-		fmt.Println("fail to query")
-		return nil, err
-	}
-	result := []Location{}
-	for rows.Next() {
-		var l Location
-		err = rows.Scan(&l.Id, &l.Address, &l.City, &l.State, &l.Zip)
+	idInt, err := strconv.Atoi(id)
+	if err == nil {
+		q := "UPDATE locations SET address = ?, city = ?, state = ?, zip = ? WHERE id = ?"
+		_, err := conn.ExecContext(c.Request().Context(), q, address, city, state, zip, id)
 		if err != nil {
-			fmt.Println("invalid query row data")
-			return nil, err
+			return Location{}, err
 		}
-		result = append(result, l)
+		return get(c, idInt)
+	} else {
+		q := "INSERT INTO locations (address, city, state, zip) VALUES (?,?,?,?);"
+		_, err := conn.ExecContext(c.Request().Context(), q, address, city, state, zip)
+		if err != nil {
+			fmt.Printf("address: %s city: %s, state: %s, zip: %s\n", address, city, state, zip)
+			fmt.Println(err)
+			return Location{}, err
+		}
+		return getLast(c)
 	}
-	return result, nil
+}
+
+func get(c echo.Context, id int) (Location, error) {
+	conn, err := db.GetConn()
+	if err != nil {
+		fmt.Println("fail to connect")
+		return Location{}, err
+	}
+	q := "SELECT id, address, city, state, zip FROM locations WHERE id = ?"
+	l := Location{}
+	err = conn.QueryRowContext(c.Request().Context(), q, id).Scan(&l.Id, &l.Address, &l.City, &l.State, &l.Zip)
+	if err == sql.ErrNoRows {
+		fmt.Println("query returned no rows")
+		return Location{}, err
+	} else if err != nil {
+		fmt.Println("fail to query")
+		return Location{}, err
+	}
+	return l, nil
+}
+
+func getLast(c echo.Context) (Location, error) {
+	conn, err := db.GetConn()
+	if err != nil {
+		fmt.Println("fail to connect")
+		return Location{}, err
+	}
+	q := "SELECT id, address, city, state, zip FROM locations ORDER BY id DESC;"
+	l := Location{}
+	err = conn.QueryRowContext(c.Request().Context(), q).Scan(&l.Id, &l.Address, &l.City, &l.State, &l.Zip)
+	if err == sql.ErrNoRows {
+		fmt.Println("query returned no rows")
+		return Location{}, err
+	} else if err != nil {
+		fmt.Println("fail to query")
+		return Location{}, err
+	}
+	return l, nil
 }
