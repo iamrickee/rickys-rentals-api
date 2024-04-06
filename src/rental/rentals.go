@@ -33,7 +33,7 @@ func getList(c echo.Context) ([]Rental, error) {
 		fmt.Println("fail to connect")
 		return nil, err
 	}
-	q := "SELECT id, name, description FROM rentals;"
+	q := "SELECT id, name, description FROM rentals ORDER BY id DESC;"
 	rows, err := conn.QueryContext(c.Request().Context(), q)
 	if err != nil {
 		fmt.Println("fail to query")

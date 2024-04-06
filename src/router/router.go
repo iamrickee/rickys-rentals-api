@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"iamricky.com/truck-rental/auth"
 	"iamricky.com/truck-rental/config"
+	"iamricky.com/truck-rental/lead"
 	"iamricky.com/truck-rental/location"
 	authMiddleware "iamricky.com/truck-rental/middleware"
 	"iamricky.com/truck-rental/rental"
@@ -62,6 +63,19 @@ func Route() {
 	})
 	authGroup.GET("/rental/get", func(c echo.Context) error {
 		return rental.GetRoute(c)
+	})
+
+	authGroup.GET("/leads", func(c echo.Context) error {
+		return lead.ListRoute(c)
+	})
+	authGroup.PUT("/lead/save", func(c echo.Context) error {
+		return lead.SaveRoute(c)
+	})
+	authGroup.DELETE("/lead/delete", func(c echo.Context) error {
+		return lead.DeleteRoute(c)
+	})
+	authGroup.GET("/lead/get", func(c echo.Context) error {
+		return lead.GetRoute(c)
 	})
 
 	e.Logger.Fatal(e.Start(":8080"))
