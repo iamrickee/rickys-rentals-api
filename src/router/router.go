@@ -9,6 +9,7 @@ import (
 	"iamricky.com/truck-rental/config"
 	"iamricky.com/truck-rental/location"
 	authMiddleware "iamricky.com/truck-rental/middleware"
+	"iamricky.com/truck-rental/rental"
 )
 
 func Route() {
@@ -40,17 +41,27 @@ func Route() {
 	authGroup.GET("/locations", func(c echo.Context) error {
 		return location.ListRoute(c)
 	})
-
 	authGroup.PUT("/location/save", func(c echo.Context) error {
 		return location.SaveRoute(c)
 	})
-
 	authGroup.DELETE("/location/delete", func(c echo.Context) error {
 		return location.DeleteRoute(c)
 	})
-
 	authGroup.GET("/location/get", func(c echo.Context) error {
 		return location.GetRoute(c)
+	})
+
+	authGroup.GET("/rentals", func(c echo.Context) error {
+		return rental.ListRoute(c)
+	})
+	authGroup.PUT("/rental/save", func(c echo.Context) error {
+		return rental.SaveRoute(c)
+	})
+	authGroup.DELETE("/rental/delete", func(c echo.Context) error {
+		return rental.DeleteRoute(c)
+	})
+	authGroup.GET("/rental/get", func(c echo.Context) error {
+		return rental.GetRoute(c)
 	})
 
 	e.Logger.Fatal(e.Start(":8080"))
