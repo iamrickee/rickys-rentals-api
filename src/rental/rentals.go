@@ -33,7 +33,7 @@ func getList(c echo.Context) ([]Rental, error) {
 		fmt.Println("fail to connect")
 		return nil, err
 	}
-	q := "SELECT id, name, description FROM rentals ORDER BY id DESC;"
+	q := "SELECT id, name, description, image FROM rentals ORDER BY id DESC;"
 	rows, err := conn.QueryContext(c.Request().Context(), q)
 	if err != nil {
 		fmt.Println("fail to query")
@@ -42,7 +42,7 @@ func getList(c echo.Context) ([]Rental, error) {
 	result := []Rental{}
 	for rows.Next() {
 		var r Rental
-		err = rows.Scan(&r.Id, &r.Name, &r.Description)
+		err = rows.Scan(&r.Id, &r.Name, &r.Description, &r.Image)
 		if err != nil {
 			fmt.Println("invalid query row data")
 			return nil, err

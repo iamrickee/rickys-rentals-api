@@ -15,6 +15,7 @@ type Rental struct {
 	Id          int    `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
+	Image       string `json:"image"`
 }
 
 type RentalResp struct {
@@ -75,6 +76,7 @@ func save(c echo.Context) (Rental, error) {
 	id := c.FormValue("id")
 	name := c.FormValue("name")
 	description := c.FormValue("description")
+	image := c.FormValue("image")
 	conn, err := db.GetConn()
 	if err != nil {
 		fmt.Println("fail to connect")
@@ -82,17 +84,17 @@ func save(c echo.Context) (Rental, error) {
 	}
 	idInt, err := strconv.Atoi(id)
 	if err == nil {
-		q := "UPDATE rentals SET name = ?, description = ? WHERE id = ?"
-		_, err := conn.ExecContext(c.Request().Context(), q, name, description, idInt)
+		q := "UPDATE rentals SET name = ?, description = ?, image = ? WHERE id = ?"
+		_, err := conn.ExecContext(c.Request().Context(), q, name, description, image, idInt)
 		if err != nil {
 			return Rental{}, err
 		}
 		return get(c, idInt)
 	} else {
-		q := "INSERT INTO rentals (name, description) VALUES (?,?);"
-		_, err := conn.ExecContext(c.Request().Context(), q, name, description)
+		q := "INSERT INTO rentals (name, description, image) VALUES (?,?,?);"
+		_, err := conn.ExecContext(c.Request().Context(), q, name, description, image)
 		if err != nil {
-			fmt.Printf("name: %s description: %s\n", name, description)
+			fmt.Printf("name: %s description: %s image: %s\n", name, description, image)
 			fmt.Println(err)
 			return Rental{}, err
 		}
@@ -123,9 +125,9 @@ func get(c echo.Context, id int) (Rental, error) {
 		fmt.Println("fail to connect")
 		return Rental{}, err
 	}
-	q := "SELECT id, name, description FROM rentals WHERE id = ?"
+	q := "SELECT id, name, description, image FROM rentals WHERE id = ?"
 	r := Rental{}
-	err = conn.QueryRowContext(c.Request().Context(), q, id).Scan(&r.Id, &r.Name, &r.Description)
+	err = conn.QueryRowContext(c.Request().Context(), q, id).Scan(&r.Id, &r.Name, &r.Description, &r.Image)
 	if err == sql.ErrNoRows {
 		fmt.Println("query returned no rows")
 		return Rental{}, err
@@ -142,9 +144,9 @@ func getLast(c echo.Context) (Rental, error) {
 		fmt.Println("fail to connect")
 		return Rental{}, err
 	}
-	q := "SELECT id, name, description FROM rentals ORDER BY id DESC;"
+	q := "SELECT id, name, description, image FROM rentals ORDER BY id DESC;"
 	r := Rental{}
-	err = conn.QueryRowContext(c.Request().Context(), q).Scan(&r.Id, &r.Name, &r.Description)
+	err = conn.QueryRowContext(c.Request().Context(), q).Scan(&r.Id, &r.Name, &r.Description, &r.Image)
 	if err == sql.ErrNoRows {
 		fmt.Println("query returned no rows")
 		return Rental{}, err
